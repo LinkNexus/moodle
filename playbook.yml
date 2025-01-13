@@ -1,0 +1,24 @@
+---
+- name: Deploying my Moodle System on a distant Server
+  hosts: digitalocean
+  vars:
+    dest_dir: /home/moodle/public_html
+  tasks:
+    - name: Purging the destination directory
+      ansible.builtin.command:
+        cmd: rm -rf {{ dest_dir }}/*
+
+    - name: Copying the Moodle files
+      synchronize:
+        src: "./"
+        dest: "{{ dest_dir }}"
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=.gitignore"
+          - "--exclude=.gitmodules"
+          - "--exclude=.gitattributes"
+
+    - name: Copying the config.php file
+      copy:
+        src: ./server_config.php
+        dest: "{{ dest_dir }}/config.php"
